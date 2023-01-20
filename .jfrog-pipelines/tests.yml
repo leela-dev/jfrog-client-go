@@ -67,7 +67,7 @@ pipelines:
             - name: jfrogClient
           inputSteps:
             - name: lint
-        multiNode: true
+          multiNode: true
         stepletMultipliers:
           nodePools:
             - windows
