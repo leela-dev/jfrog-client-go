@@ -91,7 +91,7 @@ pipelines:
           onExecute:
             - cd $res_jfrogClient_resourcePath
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
-              ~/go/bin/local-rt-setup
+            - ~/go/bin/local-rt-setup
             - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.artifactory --ci.runId=${os}-${suite}
 
 
