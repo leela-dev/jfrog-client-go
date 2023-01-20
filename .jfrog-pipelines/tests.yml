@@ -52,6 +52,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
+            - cd $res_jfrogClient_resourcePath
             - go vet -v ./...
 
 
