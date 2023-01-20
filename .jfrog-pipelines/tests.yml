@@ -1,0 +1,47 @@
+resources:
+  - name: jfrogClient
+    type: GitRepo
+    configuration:
+      gitProvider: LeelaGitHub
+      path: leela-dev/jfrog-client-go
+      buildOn:
+        pullRequestCreate: true
+pipelines:
+  - name: jfrog_client_go_tests
+    configuration:
+      jfrogCliVersion: 2
+      runtime:
+        type: image
+        image:
+          custom:
+            name: releases-docker.jfrog.io/jfrog/pipelines-u18node
+            tag: "16"
+            autoPull: true
+    environmentVariables:
+      readOnly:
+        RESOLVE_REPO: npm-virtual
+    steps:
+      - name: unlabel_pr
+        type: Bash
+        execution:
+          onExecute:
+            - echo "Need to check the ways to do this"
+      - name: go_cache
+        type: Bash
+        execution:
+          onExecute:
+            - echo "TBD"
+      - name: lint
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - go vet -v ./...
+
+
+
