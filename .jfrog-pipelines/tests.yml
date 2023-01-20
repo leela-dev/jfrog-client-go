@@ -54,6 +54,40 @@ pipelines:
           onExecute:
             - cd $res_jfrogClient_resourcePath
             - go vet -v ./...
+      - name: artifactory_tests
+        type: Matrix
+        stepMode: Bash
+        configuration:
+          environmentVariables:
+            JF_URL: $int_int_default_artifactory_url
+            GOPROXY: direct
+          integrations:
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClient
+          inputSteps:
+            - name: lint
+        multiNode: true
+        stepletMultipliers:
+          nodePools:
+            - windows
+            - ubuntu_18
+            - ubuntu_16
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - cd $res_jfrogClient_resourcePath
+            - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
+              ~/go/bin/local-rt-setup
+
+
+
 
 
 
