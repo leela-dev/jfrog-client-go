@@ -33,6 +33,9 @@ pipelines:
             - echo "TBD"
       - name: lint
         type: Bash
+        configuration:
+          inputSteps:
+            - name: unlabel_pr
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
