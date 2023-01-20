@@ -69,10 +69,17 @@ pipelines:
             - name: lint
           multiNode: true
         stepletMultipliers:
-          nodePools:
-            - windows
-            - ubuntu_18
-            - ubuntu_16
+          environmentVariables:
+            - suite : artifactory
+              os: ubuntu-latest
+            - suite : artifactory
+              os: macos-latest
+            - suite : artifactory
+              os: windows-latest
+#          nodePools:
+#            - windows
+#            - ubuntu_18
+#            - ubuntu_16
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -85,6 +92,7 @@ pipelines:
             - cd $res_jfrogClient_resourcePath
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
               ~/go/bin/local-rt-setup
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.artifactory --ci.runId=${os}-${suite}
 
 
 
