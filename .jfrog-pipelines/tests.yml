@@ -37,6 +37,10 @@ pipelines:
       - name: lint
         type: Bash
         configuration:
+          integrations:
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClient
           inputSteps:
             - name: unlabel_pr
         execution:
