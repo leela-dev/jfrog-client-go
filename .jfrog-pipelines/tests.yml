@@ -28,6 +28,9 @@ pipelines:
             - echo "Need to check the ways to do this"
       - name: go_cache
         type: Bash
+        configuration:
+          inputSteps:
+            - name: unlabel_pr
         execution:
           onExecute:
             - echo "TBD"
