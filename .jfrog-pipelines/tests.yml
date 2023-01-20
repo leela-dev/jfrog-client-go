@@ -17,9 +17,9 @@ pipelines:
             name: releases-docker.jfrog.io/jfrog/pipelines-u18node
             tag: "16"
             autoPull: true
-    environmentVariables:
-      readOnly:
-        RESOLVE_REPO: npm-virtual
+      environmentVariables:
+        readOnly:
+          RESOLVE_REPO: npm-virtual
     steps:
       - name: unlabel_pr
         type: Bash
