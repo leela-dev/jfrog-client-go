@@ -98,6 +98,45 @@ pipelines:
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
             - ~/go/bin/local-rt-setup
             - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.artifactory --ci.runId=${os}-${suite}
+      - name: ds_xr_access_tests
+        type: Matrix
+        stepMode: Bash
+        configuration:
+          environmentVariables:
+            JF_URL: $int_int_default_artifactory_url
+            GOPROXY: direct
+          integrations:
+            - name: jfrogPlatform
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClient
+          inputSteps:
+            - name: lint
+          multiNode: true
+        stepletMultipliers:
+          environmentVariables:
+            - suite : distribution
+              os: ubuntu-latest
+            - suite : xray
+              os: macos-latest
+            - suite : access
+              os: windows-latest
+#          nodePools:
+#            - windows
+#            - ubuntu_18
+#            - ubuntu_16
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - cd $res_jfrogClient_resourcePath
+            - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.${suite} --rt.url=$int_int_default_artifactory_url --ds.url=$HOST_URL/distribution --xr.url=$HOST_URL/xray --access.url=$HOST_URL/access --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --access.token=$int_jfrogPlatform_accessToken --ci.runId=${os}-${suite}
       - name: pipeline_tests
         type: Matrix
         stepMode: Bash
@@ -136,7 +175,7 @@ pipelines:
           onExecute:
             - cd $res_jfrogClient_resourcePath
             - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
-            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url/artifactory --pipe.url=$HOST_URL/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=$res_jfrogClient_gitRepoFullName --pipe.vcsBranch=$res_jfrogClient_branchName --ci.runId=${os}_pipe
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url --pipe.url=$HOST_URL/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=$res_jfrogClient_gitRepoFullName --pipe.vcsBranch=$res_jfrogClient_branchName --ci.runId=${os}_pipe
 
 
 
