@@ -133,7 +133,7 @@ pipelines:
             - cd $res_jfrogClient_resourcePath
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
             - ~/go/bin/local-rt-setup
-            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url/artifactory --pipe.url=$int_int_default_artifactory_url/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_int_default_artifactory_apikey --pipe.vcsToken=${{ secrets.CLI_PIPE_VCS_TOKEN }} --pipe.vcsRepo=${{ secrets.CLI_PIPE_VCS_REPO }} --pipe.vcsBranch=${{ secrets.CLI_PIPE_VCS_BRANCH }} --ci.runId=${os}_pipe
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url/artifactory --pipe.url=$int_int_default_artifactory_url/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_int_default_artifactory_apikey --pipe.vcsToken=$int_int_default_artifactory_apikey --pipe.vcsRepo= --pipe.vcsBranch= --ci.runId=${os}_pipe
 
 
 
