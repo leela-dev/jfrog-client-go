@@ -128,11 +128,8 @@ pipelines:
                 cacheIntegration: int_default_artifactory
             - go version
             - go env GOPATH
-            - cd $res_jfrogClient_resourcePath
-            - go vet -v ./...
           onExecute:
             - cd $res_jfrogClient_resourcePath
-            - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
             - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url/artifactory --pipe.url=$int_int_default_artifactory_url/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=$res_jfrogClient_gitRepoFullName --pipe.vcsBranch=$res_jfrogClient_branchName --ci.runId=${os}_pipe
 
 
