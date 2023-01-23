@@ -133,7 +133,9 @@ pipelines:
             - go env GOPATH
           onExecute:
             - cd $res_jfrogClient_resourcePath
-            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url/artifactory --pipe.url=$pipelines_api_url --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=$res_jfrogClient_gitRepoFullName --pipe.vcsBranch=$res_jfrogClient_branchName --ci.runId=${os}_pipe
+            - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | cut -f1 -d'/')"
+            - echo $HOST_URL
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url/artifactory --pipe.url=$HOST_URL/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=$res_jfrogClient_gitRepoFullName --pipe.vcsBranch=$res_jfrogClient_branchName --ci.runId=${os}_pipe
 
 
 
