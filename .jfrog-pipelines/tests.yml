@@ -45,9 +45,9 @@ pipelines:
             - name: unlabel_pr
         execution:
           onStart:
-            - printenv
+            - echo $JPD_URL
             - echo $pipelines_api_url
-            - echo $pipelines_url
+            - printenv
             - task: jfrog/setup-go@v0.0.2
               input:
                 version: "1.19.3"
