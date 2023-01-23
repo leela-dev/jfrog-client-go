@@ -101,6 +101,7 @@ pipelines:
             JF_URL: $int_int_default_artifactory_url
             GOPROXY: direct
           integrations:
+            - name: jfrogPlatform
             - name: int_default_artifactory
           inputResources:
             - name: jfrogClient
@@ -132,8 +133,7 @@ pipelines:
           onExecute:
             - cd $res_jfrogClient_resourcePath
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
-            - ~/go/bin/local-rt-setup
-            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url/artifactory --pipe.url=$int_int_default_artifactory_url/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_int_default_artifactory_apikey --pipe.vcsToken=$int_int_default_artifactory_apikey --pipe.vcsRepo= --pipe.vcsBranch= --ci.runId=${os}_pipe
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url/artifactory --pipe.url=$int_int_default_artifactory_url/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=leela-dev/jfrog-client-go --pipe.vcsBranch=dev --ci.runId=${os}_pipe
 
 
 
