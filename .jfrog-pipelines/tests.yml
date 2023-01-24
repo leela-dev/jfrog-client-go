@@ -39,6 +39,7 @@ pipelines:
         configuration:
           integrations:
             - name: int_default_artifactory
+            - name: EcoSysSecrets
           inputResources:
             - name: jfrogClient
           inputSteps:
