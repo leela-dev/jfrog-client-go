@@ -75,15 +75,8 @@ pipelines:
             - name: lint
           multiNode: true
         stepletMultipliers:
-          environmentVariables:
-            - suite : artifactory
-              os: ubuntu-latest
-            - suite : artifactory
-              os: macos-latest
-            - suite : artifactory
-              os: windows-latest
-#          nodePools:
-#            - windows
+          nodePools:
+            - default-dynamic-nodepool
 #            - ubuntu_18
 #            - ubuntu_16
         execution:
@@ -98,7 +91,7 @@ pipelines:
             - cd $res_jfrogClient_resourcePath
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
             - ~/go/bin/local-rt-setup
-            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.artifactory --ci.runId=${os}-${suite}
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.artifactory --ci.runId=${operating_system}-artifactory
       - name: ds_xr_access_tests
         type: Matrix
         stepMode: Bash
