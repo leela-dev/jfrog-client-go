@@ -77,7 +77,7 @@ pipelines:
         stepletMultipliers:
           nodePools:
             - default-dynamic-nodepool
-#            - ubuntu_18
+            - windows_dynamic
 #            - ubuntu_16
         execution:
           onStart:
@@ -108,29 +108,13 @@ pipelines:
             - name: lint
           multiNode: true
         stepletMultipliers:
+          nodePools:
+            - default-dynamic-nodepool
+            - windows_dynamic
           environmentVariables:
             - suite : distribution
-              os: ubuntu-latest
             - suite : xray
-              os: ubuntu-latest
             - suite : access
-              os: ubuntu-latest
-            - suite : distribution
-              os: macos-latest
-            - suite : xray
-              os: macos-latest
-            - suite : access
-              os: macos-latest
-            - suite : distribution
-              os: windows-latest
-            - suite : xray
-              os: windows-latest
-            - suite : access
-              os: windows-latest
-#          nodePools:
-#            - windows
-#            - ubuntu_18
-#            - ubuntu_16
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -142,8 +126,8 @@ pipelines:
           onExecute:
             - cd $res_jfrogClient_resourcePath
             - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
-            - echo "go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.${suite} --rt.url=$int_int_default_artifactory_url --ds.url=$HOST_URL/distribution --xr.url=$HOST_URL/xray --access.url=$HOST_URL/access --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --access.token=$int_jfrogPlatform_accessToken --ci.runId=${os}-${suite}"
-            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.${suite} --rt.url=$int_int_default_artifactory_url --ds.url=$HOST_URL/distribution --xr.url=$HOST_URL/xray --access.url=$HOST_URL/access --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --access.token=$int_jfrogPlatform_accessToken --ci.runId=${os}-${suite}
+            - echo "go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.${suite} --rt.url=$int_int_default_artifactory_url --ds.url=$HOST_URL/distribution --xr.url=$HOST_URL/xray --access.url=$HOST_URL/access --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --access.token=$int_jfrogPlatform_accessToken --ci.runId=${operating_system}-${suite}"
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.${suite} --rt.url=$int_int_default_artifactory_url --ds.url=$HOST_URL/distribution --xr.url=$HOST_URL/xray --access.url=$HOST_URL/access --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --access.token=$int_jfrogPlatform_accessToken --ci.runId=${operating_system}-${suite}
       - name: pipeline_tests
         type: Bash
         configuration:
