@@ -122,13 +122,9 @@ async function DownloadBinary() {
   }
   try {
     const {stdOut, stdErr} = await tasks.execute(command);
-    if (stdErr) {
-      tasks.error(stdErr.toString())
-    } else if (stdOut) {
-      tasks.info(stdOut.toString())
-    }
+    tasks.info(stdErr)
+    tasks.info(stdOut)
   } catch (e) {
-    tasks.error(e.toString())
     throw new Error(e)
   }
 }
@@ -138,7 +134,7 @@ async function DownloadBinary() {
  */
 async function RunFrogbot(inputs) {
   const binary = getExecutableName()
-  tasks.info("Running frogbot scan... using:"+binary)
+  tasks.info("Running frogbot scan... using:"+binary+" "+inputs.botAction)
   try {
     const path = tasks.getVariable("EXECUTION_PATH")
     const {stdout, stderr} = (await tasks.execute(`cd ${path} && ${binary} ${inputs.botAction}`))
