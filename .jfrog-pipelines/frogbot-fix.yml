@@ -42,6 +42,31 @@ pipelines:
             JF_GIT_API_ENDPOINT: $int_LeelaGitHub_url
         execution:
           onStart:
+            - pushd $res_jfrogClientGo_resourcePath/frogbot-task
+            - jfrog npmc --repo-resolve $RESOLVE_REPO
+            - jfrog npm install
+            - npm run dist
+            - popd
+            # Run frogbot task
+            - task: $res_jfrogClientGo_resourcePath/frogbot-task
+              id: frogbot_test
+              input:
+                # full repository name
+                repository: "leela-dev/jfrog-client-go"
+                # JFrog Platform URL
+                platformURL: "https://pipeecosys.jfrogdev.org/"
+                # integration name for access token of platform
+                accessToken: "jfrogPlatform"
+                # integration for git token to access git server provider
+                gitToken: "LeelaGitHub"
+                # git provider name
+                provider: "github"
+                # git provider end point
+                endPoint: "https://api.github.com"
+                # action to be done by frogbot
+                botAction: "scan-pull-request"
+                # pull request id
+                pullRequestID: $res_jfrogGoClient_pullRequestNumber
             - task: jfrog/setup-go@v0.0.2
               input:
                 version: "1.19.3"
