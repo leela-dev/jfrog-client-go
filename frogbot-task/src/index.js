@@ -2,13 +2,10 @@ const tasks = require('jfrog-pipelines-tasks')
 
 module.exports = {
   readInputs,
-  validateInputs,
   setupFrogbotEnvironment,
   PrepareFrogbotEnvironment,
   DownloadBinary,
   RunFrogbot,
-  getExecutableName,
-  isWindows,
   readFromGenericIntegration,
 }
 
@@ -82,7 +79,7 @@ async function executeTask() {
  * Prepares object with key value pairs. Sets frogbot expected
  * environment variable as key and relative input as value.
  * @params inputs
- * @returns frogbot
+ * @returns {JF_URL: (string|*), JF_GIT_PROVIDER: (string|*), JF_GIT_API_ENDPOINT: (string|*), JF_ACCESS_TOKEN: string, JF_GIT_TOKEN: string, JF_GIT_REPO: string, JF_GIT_PULL_REQUEST_ID: (string|*), JF_GIT_OWNER: string, JF_INSTALL_DEPS_CMD: string}
  */
  function PrepareFrogbotEnvironment(inputs) {
   const fullRepo = String(inputs.repoName).split("/", 2)
@@ -97,6 +94,7 @@ async function executeTask() {
     'JF_GIT_API_ENDPOINT': inputs.gitEndPoint,
     'JF_GIT_PULL_REQUEST_ID': inputs.pullRequestID,
     'JF_URL': inputs.platformURL,
+    'JF_INSTALL_DEPS_CMD': "jf npmc "+tasks.getVariable("RESOLVE_REPO")
   }
 }
 
@@ -140,7 +138,7 @@ async function DownloadBinary() {
  */
 async function RunFrogbot(inputs) {
   const binary = getExecutableName()
-  tasks.debug("Executable name is determined as:" + binary)
+  tasks.info("Running frogbot scan... using:"+binary)
   try {
     const path = tasks.getVariable("EXECUTION_PATH")
     const {stdout, stderr} = (await tasks.execute(`cd ${path} && ${binary} ${inputs.botAction}`))
@@ -168,7 +166,7 @@ async function RunFrogbot(inputs) {
 }
 
 /**
- * Reads slack token value from integration
+ * Retrieves generic integration and fetches variable passed as @param tokenName
  * @param integrationName
  * @param tokenName
  * @returns {string}

@@ -5,4 +5,4 @@
         - main
     scan:
       projects:
-        - installCommand: "npm install --no-fund"
+        - installCommand: "npm i"

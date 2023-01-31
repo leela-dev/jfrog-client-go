@@ -44,9 +44,9 @@ pipelines:
           onExecute:
             - pushd $res_frogbot_gitrepo_resourcePath
             # Configure JFrog CLI
-            - jfrog npmc --repo-resolve $RESOLVE_REPO
+            - jf npmc --repo-resolve $RESOLVE_REPO
             # Install npm dependencies
-            - jfrog npm install
+            - jf npm install
             # Build task runnable script bundled with dependencies
             - npm run dist
             # create test coverage report
@@ -55,7 +55,7 @@ pipelines:
 
             # Run task
             - task: $res_frogbot_gitrepo_resourcePath
-              id: slack_test
+              id: frogbot_test
               input:
                 # full repository name
                 repository: "bhanurp/frogbot"
@@ -70,7 +70,7 @@ pipelines:
                 # git provider end point
                 endPoint: "https://api.github.com"
                 # action to be done by frogbot
-                botAction: "create-fix-pull-requests"
+                botAction: "scan-pull-request"
                 # pull request id
                 pullRequestID: $res_jfrogGoClient_pullRequestNumber
             - echo "scan is done successfully $OUT_frogbot_test_message"
