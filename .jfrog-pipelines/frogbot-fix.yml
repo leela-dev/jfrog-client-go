@@ -42,6 +42,13 @@ pipelines:
             JF_GIT_API_ENDPOINT: $int_LeelaGitHub_url
         execution:
           onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
             - pushd $res_jfrogClientGo_resourcePath/frogbot-task
             - jfrog npmc --repo-resolve $RESOLVE_REPO
             - jfrog npm install
@@ -67,13 +74,6 @@ pipelines:
                 botAction: "scan-pull-request"
                 # pull request id
                 pullRequestID: $res_jfrogGoClient_pullRequestNumber
-            - task: jfrog/setup-go@v0.0.2
-              input:
-                version: "1.19.3"
-                cacheIntegration: int_default_artifactory
-            - go version
-            - go env GOPATH
-          onExecute:
             - cd $res_jfrogClientGo_resourcePath
             - curl -fLg "https://releases.jfrog.io/artifactory/frogbot/v2/[RELEASE]/getFrogbot.sh" | sh
             - ./frogbot create-fix-pull-requests
