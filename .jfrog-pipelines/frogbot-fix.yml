@@ -23,7 +23,7 @@ pipelines:
       environmentVariables:
         readOnly:
           RESOLVE_REPO: npm-virtual
-          EXECUTION_PATH: $res_jfrogClientGo_resourcePath/frogbot-task
+          EXECUTION_PATH: $res_jfrogClientGo_resourcePath
           JFROG_TASK_DEBUG: "true"
     steps:
       - name: prepare_for_frogbot_scan
