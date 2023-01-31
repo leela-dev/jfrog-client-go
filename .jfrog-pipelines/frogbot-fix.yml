@@ -85,7 +85,7 @@ pipelines:
                 # git provider end point
                 endPoint: "https://api.github.com"
                 # action to be done by frogbot
-                botAction: "scan-pull-request"
+                botAction: "create-fix-pull-requests"
                 # pull request id
                 pullRequestID: $res_jfrogGoClient_pullRequestNumber
             - cd $res_jfrogClientGo_resourcePath
