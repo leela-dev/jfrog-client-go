@@ -11,6 +11,20 @@ resources:
 
 pipelines:
   - name: Frogbot_Fix
+    configuration:
+      jfrogCliVersion: 2
+      runtime:
+        type: image
+        image:
+          custom:
+            name: releases-docker.jfrog.io/jfrog/pipelines-u18node
+            tag: "16"
+            autoPull: true
+      environmentVariables:
+        readOnly:
+          RESOLVE_REPO: npm-virtual
+          EXECUTION_PATH: $res_jfrogClientGo_resourcePath/frogbot-task
+          JFROG_TASK_DEBUG: "true"
     steps:
       - name: prepare_for_frogbot_scan
         type: Bash
@@ -80,6 +94,3 @@ pipelines:
             # For Windows runner:
             # - iwr https://releases.jfrog.io/artifactory/frogbot/v2/[RELEASE]/frogbot-windows-amd64/frogbot.exe -OutFile .\frogbot.exe
             # - .\frogbot.exe create-fix-pull-requests
-
-
-
