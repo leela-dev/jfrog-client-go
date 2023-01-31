@@ -1,0 +1,30 @@
+name: frogbot
+description: Jfrog pipelines task for frogbot
+source: github.com/bhanurp/frogbot
+labels:
+  - frogbot
+  - node
+  - xray
+  - security
+input:
+  - name: repository
+    description: full name of git repository to scan
+  - name: plarformURL
+    description: JFrog platform URL
+  - name: accessToken
+    description: generic integration used to fetch token to connect to JFrog Xray
+  - name: gitToken
+    description: generic integration to fetch git token
+  - name: provider
+    description: git repository provider name
+  - name: endPoint
+    description: git provider api endpoint
+  - name: botAction
+    description: action to be performed by frogbot for example create-fix-pull-requests/scan-pull-request
+  - name: version
+    description: version of frogbot to install
+output:
+  - name: scan_results
+    description: results of frogbot scan
+execution:
+  - node16 dist/index.js

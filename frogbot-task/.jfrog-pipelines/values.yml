@@ -1,0 +1,7 @@
+repoPath: bhanurp/frogbot
+mainBranch: main
+gitToken: gh_frogbot
+artIntegration: int_default_artifactory
+accessToken: jfrogPlatform
+gitIntegration: gh_int_bhanu
+windowsNodePool:

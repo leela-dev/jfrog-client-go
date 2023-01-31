@@ -1,0 +1,8 @@
+- params:
+    git:
+      repoName: frogbot
+      branches:
+        - main
+    scan:
+      projects:
+        - installCommand: "npm install --no-fund"
