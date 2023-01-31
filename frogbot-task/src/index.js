@@ -92,9 +92,10 @@ function PrepareFrogbotEnvironment(inputs) {
         'JF_GIT_TOKEN': gitTokenSecret,
         'JF_GIT_PROVIDER': inputs.gitProvider,
         'JF_GIT_API_ENDPOINT': inputs.gitEndPoint,
-        'JF_GIT_PULL_REQUEST_ID': inputs.pullRequestID,
+        'JF_GIT_PULL_REQUEST_ID': tasks.getVariable("JF_GIT_PR_ID"),
         'JF_URL': inputs.platformURL,
         'JF_INSTALL_DEPS_CMD': "jf npmc "+tasks.getVariable("RESOLVE_REPO")
+
     }
 }
 

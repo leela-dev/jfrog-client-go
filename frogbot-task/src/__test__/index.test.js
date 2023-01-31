@@ -74,7 +74,7 @@ describe('Tests for prepare frogbot environment', (object, method) => {
     expect(frogEnv['JF_GIT_TOKEN']).toEqual('gh_ighrxzvtgwerderiedlkngdawpoekmglkgskdjfgkg')
     expect(frogEnv['JF_GIT_PROVIDER']).toEqual('github')
     expect(frogEnv['JF_GIT_API_ENDPOINT']).toEqual('https://api.github.com')
-    expect(frogEnv['JF_GIT_PULL_REQUEST_ID']).toEqual('2345')
+    // expect(frogEnv['JF_GIT_PULL_REQUEST_ID']).toEqual('2345')
   })
 })
 

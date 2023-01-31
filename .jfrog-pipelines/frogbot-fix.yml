@@ -54,6 +54,7 @@ pipelines:
             JF_GIT_TOKEN: $int_LeelaGitHub_token
             JF_GIT_PROVIDER: "github"
             JF_GIT_API_ENDPOINT: $int_LeelaGitHub_url
+            JF_GIT_PR_ID: $res_jfrogGoClient_pullRequestNumber
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -85,7 +86,7 @@ pipelines:
                 # git provider end point
                 endPoint: "https://api.github.com"
                 # action to be done by frogbot
-                botAction: "create-fix-pull-requests"
+                botAction: "scan-pull-request"
                 # pull request id
                 pullRequestID: $res_jfrogGoClient_pullRequestNumber
             - cd $res_jfrogClientGo_resourcePath
