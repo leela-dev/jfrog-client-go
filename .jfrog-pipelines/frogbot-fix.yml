@@ -58,10 +58,8 @@ pipelines:
             - popd
             - add_run_variables JF_GIT_OWNER="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f1 -d'/')"
             - add_run_variables JF_GIT_REPO="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f2 -d'/')"
-            - echo $JF_GIT_REPO
-            - echo $JF_GIT_OWNER
             # Run frogbot task
-            - task: $res_jfrogClientGo_resourcePath/frogbot-task
+            - task: frogbot@0.0.1
               id: frogbot_test
               input:
                 # full repository name
@@ -77,7 +75,7 @@ pipelines:
                 # git provider end point
                 endPoint: "https://api.github.com"
                 # action to be done by frogbot
-                botAction: "scan-pull-request"
+                botAction: "create-fix-pull-requests"
                 # pull request id
                 pullRequestID: $res_jfrogGoClient_pullRequestNumber
             - cd $res_jfrogClientGo_resourcePath
