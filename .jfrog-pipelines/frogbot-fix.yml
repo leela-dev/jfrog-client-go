@@ -26,17 +26,6 @@ pipelines:
           EXECUTION_PATH: $res_jfrogClientGo_resourcePath
           JFROG_TASK_DEBUG: "true"
     steps:
-      - name: prepare_for_frogbot_scan
-        type: Bash
-        configuration:
-          inputResources:
-            - name: jfrogClientGo
-        execution:
-          onExecute:
-            - add_run_variables JF_GIT_OWNER="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f1 -d'/')"
-            - add_run_variables JF_GIT_REPO="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f2 -d'/')"
-            - echo $JF_GIT_REPO
-            - echo $JF_GIT_OWNER
       - name: Frogbot_Fix
         type: Bash
         configuration:
@@ -69,6 +58,10 @@ pipelines:
             - jfrog npm install
             - npm run dist
             - popd
+            - add_run_variables JF_GIT_OWNER="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f1 -d'/')"
+            - add_run_variables JF_GIT_REPO="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f2 -d'/')"
+            - echo $JF_GIT_REPO
+            - echo $JF_GIT_OWNER
             # Run frogbot task
             - task: $res_jfrogClientGo_resourcePath/frogbot-task
               id: frogbot_test
