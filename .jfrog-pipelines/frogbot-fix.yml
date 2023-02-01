@@ -29,8 +29,6 @@ pipelines:
       - name: Frogbot_Fix
         type: Bash
         configuration:
-          inputSteps:
-            - name: prepare_for_frogbot_scan
           integrations:
             - name: jfrogPlatform
             - name: LeelaGitHub
