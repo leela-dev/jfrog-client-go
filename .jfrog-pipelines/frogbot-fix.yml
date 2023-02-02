@@ -51,7 +51,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - pushd $res_jfrogClientGo_resourcePath/frogbot-task
+            - pushd $res_jfrogClientGo_resourcePath
             - jfrog npmc --repo-resolve $RESOLVE_REPO
             - jfrog npm install
             - npm run dist
