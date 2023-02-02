@@ -27,4 +27,6 @@ output:
   - name: scan_results
     description: results of frogbot scan
 execution:
+  - pwd
   - node16 dist/index.js
+  - pwd

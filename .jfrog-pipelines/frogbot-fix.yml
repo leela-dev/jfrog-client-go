@@ -51,6 +51,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
+            - pwd
             # Run frogbot task
             - task: frogbot@v0.0.1
               id: frogbot_test
