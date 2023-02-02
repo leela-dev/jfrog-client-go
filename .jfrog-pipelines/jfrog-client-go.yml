@@ -1,0 +1,159 @@
+valuesFilePath: ./values.yml
+
+resources:
+  - name: jfrogClientGoRepoOnlyOnCommit
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.gitIntegration }}
+      path: {{ .Values.repoPath }}
+      branches:
+        include: dev
+      buildOn:
+        commit: true
+
+  - name: jfrogClientGoRepoOnlyOnPR
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.gitIntegration }}
+      path: {{ .Values.repoPath }}
+      branches:
+        include: dev
+      buildOn:
+        commit: false
+        pullRequestCreate: true
+
+  - name: jfrogClientGoRepoPushAndPR
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.gitIntegration }}
+      path: {{ .Values.repoPath }}
+      branches:
+        include: ^{{gitBranch}}$
+      buildOn:
+        commit: true
+        pullRequestCreate: true
+pipelines:
+  - name: jfrog_goclient
+    configuration:
+      jfrogCliVersion: 2
+      runtime:
+        type: image
+        image:
+          custom:
+            name: releases-docker.jfrog.io/jfrog/pipelines-u18node
+            tag: "16"
+            autoPull: true
+      environmentVariables:
+        readOnly:
+          RESOLVE_REPO: npm-virtual
+    steps:
+      - name: trigger_all
+        type: Bash
+        execution:
+          onExecute:
+            - echo "Starting pipeline run..."
+      - name: static_code_analysis
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: trigger_all
+        execution:
+          onExecute:
+            - echo Gyana is working on it hard...
+      - name: go_sec
+        type: Bash
+        configuration:
+          integrations:
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoPushAndPR
+          inputSteps:
+            - name: trigger_all
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+            - cd $res_jfrogClientGoRepoPushAndPR_resourcePath
+            - gosec -exclude=G204,G301,G302,G304,G306 -exclude-dir=\.*test\.* ./...
+      - name: Frogbot_Fix
+        type: Bash
+        configuration:
+          integrations:
+            - name: jfrogPlatform
+            - name: LeelaGitHub
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoOnlyOnCommit
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            # Run frogbot task
+            - task: frogbot@v0.0.1
+              id: frogbot_test
+              input:
+                # full repository name
+                repository: "leela-dev/jfrog-client-go"
+                # JFrog Platform URL
+                platformURL: "https://pipeecosys.jfrogdev.org/"
+                # integration name for access token of platform
+                accessToken: "jfrogPlatform"
+                # integration for git token to access git server provider
+                gitToken: "LeelaGitHub"
+                # git provider name
+                provider: "github"
+                # git provider end point
+                endPoint: "https://api.github.com"
+                # action to be done by frogbot
+                botAction: "create-fix-pull-requests"
+                # pull request id
+                pullRequestID: $res_jfrogClientGoRepoOnlyOnCommit_pullRequestNumber
+      - name: Frogbot_Scan_PR
+        type: Bash
+        configuration:
+          integrations:
+            - name: jfrogPlatform
+            - name: LeelaGitHub
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoOnlyOnPR
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            # Run frogbot task
+            - task: frogbot@v0.0.1
+              id: frogbot_test
+              input:
+                # full repository name
+                repository: "leela-dev/jfrog-client-go"
+                # JFrog Platform URL
+                platformURL: "https://pipeecosys.jfrogdev.org/"
+                # integration name for access token of platform
+                accessToken: "jfrogPlatform"
+                # integration for git token to access git server provider
+                gitToken: "LeelaGitHub"
+                # git provider name
+                provider: "github"
+                # git provider end point
+                endPoint: "https://api.github.com"
+                # action to be done by frogbot
+                botAction: "scan-pull-request"
+                # pull request id
+                pullRequestID: $res_jfrogClientGoRepoOnlyOnPR_pullRequestNumber
