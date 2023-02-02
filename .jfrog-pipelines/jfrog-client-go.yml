@@ -90,6 +90,8 @@ pipelines:
             - name: int_default_artifactory
           inputResources:
             - name: jfrogClientGoRepoOnlyOnCommit
+          inputSteps:
+            - name: trigger_all
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -122,6 +124,8 @@ pipelines:
       - name: Frogbot_Scan_PR
         type: Bash
         configuration:
+          inputSteps:
+            - name: trigger_all
           integrations:
             - name: jfrogPlatform
             - name: LeelaGitHub
