@@ -51,13 +51,6 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - pushd $res_jfrogClientGo_resourcePath
-            - jfrog npmc --repo-resolve $RESOLVE_REPO
-            - jfrog npm install
-            - npm run dist
-            - popd
-            - add_run_variables JF_GIT_OWNER="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f1 -d'/')"
-            - add_run_variables JF_GIT_REPO="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f2 -d'/')"
             # Run frogbot task
             - task: frogbot@v0.0.1
               id: frogbot_test
