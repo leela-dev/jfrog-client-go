@@ -59,7 +59,7 @@ pipelines:
             - add_run_variables JF_GIT_OWNER="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f1 -d'/')"
             - add_run_variables JF_GIT_REPO="$(echo $res_jfrogClientGo_gitRepoFullName | cut -f2 -d'/')"
             # Run frogbot task
-            - task: frogbot@0.0.1
+            - task: frogbot@v0.0.1
               id: frogbot_test
               input:
                 # full repository name
