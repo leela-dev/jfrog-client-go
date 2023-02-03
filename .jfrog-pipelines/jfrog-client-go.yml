@@ -107,16 +107,10 @@ pipelines:
               input:
                 # full repository name
                 repository: "leela-dev/jfrog-client-go"
-                # JFrog Platform URL
-                platformURL: "https://pipeecosys.jfrogdev.org/"
                 # integration name for access token of platform
-                accessToken: "jfrogPlatform"
+                platformAccessToken: "jfrogPlatform"
                 # integration for git token to access git server provider
-                gitToken: "LeelaGitHub"
-                # git provider name
-                provider: "github"
-                # git provider end point
-                endPoint: "https://api.github.com"
+                gitIntegration: "LeelaGitHub"
                 # action to be done by frogbot
                 botAction: "create-fix-pull-requests"
                 # pull request id
@@ -147,16 +141,10 @@ pipelines:
               input:
                 # full repository name
                 repository: "leela-dev/jfrog-client-go"
-                # JFrog Platform URL
-                platformURL: "https://pipeecosys.jfrogdev.org/"
                 # integration name for access token of platform
-                accessToken: "jfrogPlatform"
+                platformAccessToken: "jfrogPlatform"
                 # integration for git token to access git server provider
-                gitToken: "LeelaGitHub"
-                # git provider name
-                provider: "github"
-                # git provider end point
-                endPoint: "https://api.github.com"
+                gitIntegration: "LeelaGitHub"
                 # action to be done by frogbot
                 botAction: "scan-pull-request"
                 # pull request id
