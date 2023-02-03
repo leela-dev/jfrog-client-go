@@ -59,13 +59,11 @@ pipelines:
                 # full repository name
                 repository: "leela-dev/jfrog-client-go"
                 # integration name for access token of platform
-                platformAccessToken: "jfrogPlatform"
+                platformAccessTokenIntegration: "jfrogPlatform"
                 # integration for git token to access git server provider
-                gitIntegration: "LeelaGitHub"
+                resourceName: "jfrogClientGo"
                 # action to be done by frogbot
                 botAction: "create-fix-pull-requests"
-                # pull request id
-                pullRequestID: $res_jfrogGoClient_pullRequestNumber
             - cd $res_jfrogClientGo_resourcePath
             - curl -fLg "https://releases.jfrog.io/artifactory/frogbot/v2/[RELEASE]/getFrogbot.sh" | sh
             - ./frogbot create-fix-pull-requests
