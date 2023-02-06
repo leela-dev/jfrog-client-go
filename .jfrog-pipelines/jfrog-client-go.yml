@@ -62,6 +62,13 @@ pipelines:
           inputResources:
             - name: jfrogClientGoRepoPushAndPR
         execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
           onExecute:
             - task: jfrog/go-static-check@v0.0.1
               id: go_staticcheck
