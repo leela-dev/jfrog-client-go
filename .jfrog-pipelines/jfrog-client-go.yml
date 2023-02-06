@@ -108,13 +108,11 @@ pipelines:
                 # full repository name
                 repository: "leela-dev/jfrog-client-go"
                 # integration name for access token of platform
-                platformAccessToken: "jfrogPlatform"
+                platformAccessTokenIntegration: "jfrogPlatform"
                 # integration for git token to access git server provider
-                gitIntegration: "LeelaGitHub"
+                resourceName: "jfrogClientGo"
                 # action to be done by frogbot
                 botAction: "create-fix-pull-requests"
-                # pull request id
-                pullRequestID: $res_jfrogClientGoRepoOnlyOnCommit_pullRequestNumber
       - name: Frogbot_Scan_PR
         type: Bash
         configuration:
@@ -142,13 +140,11 @@ pipelines:
                 # full repository name
                 repository: "leela-dev/jfrog-client-go"
                 # integration name for access token of platform
-                platformAccessToken: "jfrogPlatform"
+                platformAccessTokenIntegration: "jfrogPlatform"
                 # integration for git token to access git server provider
-                gitIntegration: "LeelaGitHub"
+                resourceName: "jfrogClientGo"
                 # action to be done by frogbot
                 botAction: "scan-pull-request"
-                # pull request id
-                pullRequestID: $res_jfrogClientGoRepoOnlyOnPR_pullRequestNumber
       - name: lint
         type: Bash
         configuration:
