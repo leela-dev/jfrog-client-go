@@ -59,7 +59,8 @@ pipelines:
             - name: trigger_all
         execution:
           onExecute:
-            - echo Gyana is working on it hard...
+            - task: jfrog/go-static-check@v0.0.1
+              id: go_staticcheck
       - name: go_sec
         type: Bash
         configuration:
@@ -116,6 +117,7 @@ pipelines:
       - name: Frogbot_Scan_PR
         type: Bash
         configuration:
+          requiresApproval: true
           inputSteps:
             - name: trigger_all
           integrations:
