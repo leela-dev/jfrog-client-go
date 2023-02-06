@@ -110,7 +110,7 @@ pipelines:
                 # integration name for access token of platform
                 platformAccessTokenIntegration: "jfrogPlatform"
                 # integration for git token to access git server provider
-                resourceName: "jfrogClientGo"
+                resourceName: "jfrogClientGoRepoOnlyOnCommit"
                 # action to be done by frogbot
                 botAction: "create-fix-pull-requests"
       - name: Frogbot_Scan_PR
@@ -142,7 +142,7 @@ pipelines:
                 # integration name for access token of platform
                 platformAccessTokenIntegration: "jfrogPlatform"
                 # integration for git token to access git server provider
-                resourceName: "jfrogClientGo"
+                resourceName: "jfrogClientGoRepoOnlyOnPR"
                 # action to be done by frogbot
                 botAction: "scan-pull-request"
       - name: lint
