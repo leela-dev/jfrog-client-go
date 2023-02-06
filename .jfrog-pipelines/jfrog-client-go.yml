@@ -70,11 +70,8 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - cd $JFROG_STEP_WORKSPACE_DIR
-            - task: jfrog/go-static-check@v0.0.1
+            - task: testtask@v0.0.2
               id: go_staticcheck
-              input:
-                sourcePath: $res_jfrogClientGoRepoPushAndPR_resourcePath
       - name: go_sec
         type: Bash
         configuration:
