@@ -55,6 +55,8 @@ pipelines:
       - name: static_code_analysis
         type: Bash
         configuration:
+          integrations:
+            - name: int_default_artifactory
           inputSteps:
             - name: trigger_all
           inputResources:
