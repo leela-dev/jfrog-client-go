@@ -49,11 +49,6 @@ pipelines:
     steps:
       - name: trigger_all
         type: Bash
-        configuration:
-          inputResources:
-            - name: jfrogClientGoRepoOnlyOnCommit
-            - name: jfrogClientGoRepoPushAndPR
-            - name: jfrogClientGoRepoOnlyOnPR
         execution:
           onExecute:
             - echo "Starting pipeline run..."
@@ -75,8 +70,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - go env GOPATH
-            - export GOPATH="/root/go"
+            - cd $JFROG_STEP_WORKSPACE_DIR
             - task: jfrog/go-static-check@v0.0.1
               id: go_staticcheck
               input:
