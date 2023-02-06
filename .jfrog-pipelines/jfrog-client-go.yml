@@ -73,6 +73,8 @@ pipelines:
             - go env GOPATH
             - task: jfrog/go-static-check@v0.0.1
               id: go_staticcheck
+              input:
+                sourcePath: $res_jfrogClientGoRepoPushAndPR_resourcePath
       - name: go_sec
         type: Bash
         configuration:
