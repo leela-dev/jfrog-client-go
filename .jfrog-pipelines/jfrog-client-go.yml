@@ -57,6 +57,8 @@ pipelines:
         configuration:
           inputSteps:
             - name: trigger_all
+          inputResources:
+            - name: jfrogClientGoRepoPushAndPR
         execution:
           onExecute:
             - task: jfrog/go-static-check@v0.0.1
