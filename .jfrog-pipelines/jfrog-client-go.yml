@@ -49,6 +49,11 @@ pipelines:
     steps:
       - name: trigger_all
         type: Bash
+        configuration:
+          inputResources:
+            - name: jfrogClientGoRepoOnlyOnCommit
+            - name: jfrogClientGoRepoPushAndPR
+            - name: jfrogClientGoRepoOnlyOnPR
         execution:
           onExecute:
             - echo "Starting pipeline run..."
