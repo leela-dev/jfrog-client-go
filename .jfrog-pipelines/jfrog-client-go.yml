@@ -71,6 +71,7 @@ pipelines:
             - go env GOPATH
           onExecute:
             - go env GOPATH
+            - export GOPATH="/root/go"
             - task: jfrog/go-static-check@v0.0.1
               id: go_staticcheck
               input:
