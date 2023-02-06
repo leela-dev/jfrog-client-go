@@ -49,6 +49,11 @@ pipelines:
     steps:
       - name: trigger_all
         type: Bash
+        configuration:
+          inputResources:
+            - name: jfrogClientGoRepoOnlyOnCommit
+            - name: jfrogClientGoRepoPushAndPR
+            - name: jfrogClientGoRepoOnlyOnPR
         execution:
           onExecute:
             - echo "Starting pipeline run..."
@@ -133,6 +138,8 @@ pipelines:
         type: Bash
         configuration:
           requiresApproval: true
+          inputSteps:
+            - name: trigger_all
           integrations:
             - name: jfrogPlatform
             - name: LeelaGitHub
@@ -169,7 +176,7 @@ pipelines:
           inputResources:
             - name: jfrogClientGoRepoOnlyOnPR
           inputSteps:
-            - name: Frogbot_Scan_PR
+            - name: trigger_all
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
