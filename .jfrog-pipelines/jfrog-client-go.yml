@@ -55,9 +55,8 @@ pipelines:
             - go env GOPATH
           onExecute:
             - task: testtask@v0.0.2
-              id: go_staticcheck
               input:
-                resourceName: "jfrogClientGoRepoOnlyOnCommit"
+                resourceName: $step_triggered_by_resource_name
       - name: go_sec
         type: Bash
         configuration:
@@ -77,6 +76,9 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
+            - task: gosec@v0.0.1
+              input:
+                resourceName: $step_triggered_by_resource_name
             - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
             - cd $res_jfrogClientGoRepoOnlyOnCommit_resourcePath
             - gosec -exclude=G204,G301,G302,G304,G306 -exclude-dir=\.*test\.* ./...
