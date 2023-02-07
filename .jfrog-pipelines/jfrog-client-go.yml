@@ -56,6 +56,8 @@ pipelines:
           onExecute:
             - task: testtask@v0.0.2
               id: go_staticcheck
+              input:
+                resourceName: "jfrogClientGoRepoOnlyOnCommit"
       - name: go_sec
         type: Bash
         configuration:
