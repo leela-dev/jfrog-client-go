@@ -22,16 +22,6 @@ resources:
         commit: false
         pullRequestCreate: true
 
-  - name: jfrogClientGoRepoPushAndPR
-    type: GitRepo
-    configuration:
-      gitProvider: {{ .Values.gitIntegration }}
-      path: {{ .Values.repoPath }}
-      branches:
-        include: ^{{gitBranch}}$
-      buildOn:
-        commit: true
-        pullRequestCreate: true
 pipelines:
   - name: jfrog_goclient
     configuration:
@@ -47,20 +37,14 @@ pipelines:
         readOnly:
           RESOLVE_REPO: npm-virtual
     steps:
-      - name: trigger_all
-        type: Bash
-        execution:
-          onExecute:
-            - echo "Starting pipeline run..."
       - name: static_code_analysis
         type: Bash
         configuration:
           integrations:
             - name: int_default_artifactory
-          inputSteps:
-            - name: trigger_all
           inputResources:
-            - name: jfrogClientGoRepoPushAndPR
+            - name: jfrogClientGoRepoOnlyOnCommit
+            - name: jfrogClientGoRepoOnlyOnPR
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -78,9 +62,10 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           inputResources:
-            - name: jfrogClientGoRepoPushAndPR
+            - name: jfrogClientGoRepoOnlyOnCommit
+            - name: jfrogClientGoRepoOnlyOnPR
           inputSteps:
-            - name: trigger_all
+            - name: static_code_analysis
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -91,7 +76,7 @@ pipelines:
             - go env GOPATH
           onExecute:
             - curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
-            - cd $res_jfrogClientGoRepoPushAndPR_resourcePath
+            - cd $res_jfrogClientGoRepoOnlyOnCommit_resourcePath
             - gosec -exclude=G204,G301,G302,G304,G306 -exclude-dir=\.*test\.* ./...
       - name: Frogbot_Fix
         type: Bash
@@ -103,7 +88,7 @@ pipelines:
           inputResources:
             - name: jfrogClientGoRepoOnlyOnCommit
           inputSteps:
-            - name: trigger_all
+            - name: static_code_analysis
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -130,7 +115,7 @@ pipelines:
         configuration:
           requiresApproval: true
           inputSteps:
-            - name: trigger_all
+            - name: static_code_analysis
           integrations:
             - name: jfrogPlatform
             - name: LeelaGitHub
@@ -167,7 +152,7 @@ pipelines:
           inputResources:
             - name: jfrogClientGoRepoOnlyOnPR
           inputSteps:
-            - name: trigger_all
+            - name: static_code_analysis
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
