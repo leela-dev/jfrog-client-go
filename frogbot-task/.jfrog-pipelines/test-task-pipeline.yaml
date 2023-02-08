@@ -1,0 +1,81 @@
+template: true
+valuesFilePath: ./values.yml
+
+resources:
+  - name: frogbot_gitrepo
+    type: GitRepo
+    configuration:
+      path: {{ .Values.repoPath }}
+      gitProvider: {{ .Values.gitIntegration }}
+      branches:
+        include: ^{{ .Values.mainBranch }}$
+      cloneProtocol: https
+      buildOn:
+        pullRequestCreate: true
+
+pipelines:
+  - name: frogbot_test
+    configuration:
+      jfrogCliVersion: 2
+      runtime:
+        type: image
+        image:
+          custom:
+            name: releases-docker.jfrog.io/jfrog/pipelines-u18node
+            tag: "16"
+            autoPull: true
+      environmentVariables:
+        readOnly:
+          RESOLVE_REPO: npm-virtual
+          EXECUTION_PATH: $res_frogbot_gitrepo_resourcePath
+          JFROG_TASK_DEBUG: "true"
+
+    steps:
+      - name: test_task
+        type: Bash
+        configuration:
+          inputResources:
+            - name: frogbot_gitrepo
+          integrations:
+            - name: {{ .Values.artIntegration }}
+            - name: {{ .Values.accessToken }}
+            - name: {{ .Values.gitToken }}
+        execution:
+          onExecute:
+            - pushd $res_frogbot_gitrepo_resourcePath
+            # Configure JFrog CLI
+            - jf npmc --repo-resolve $RESOLVE_REPO
+            # Install npm dependencies
+            - jf npm install
+            # Build task runnable script bundled with dependencies
+            - npm run dist
+            # create test coverage report
+            - npx jest --coverage
+            - ls
+
+            # Run task
+            - task: $res_frogbot_gitrepo_resourcePath
+              id: frogbot_test
+              input:
+                # full repository name
+                repository: "bhanurp/frogbot"
+                # JFrog Platform URL
+                platformURL: "https://pipeecosys.jfrogdev.org/"
+                # integration name for access token of platform
+                accessToken: "jfrogPlatform"
+                # integration for git token to access git server provider
+                gitToken: "gh_frogbot"
+                # git provider name
+                provider: "github"
+                # git provider end point
+                endPoint: "https://api.github.com"
+                # action to be done by frogbot
+                botAction: "scan-pull-request"
+                # pull request id
+                pullRequestID: $res_jfrogGoClient_pullRequestNumber
+            - echo "scan is done successfully $OUT_frogbot_test_message"
+            - ls
+            - popd
+
+          onComplete:
+            - echo "Frogbot Test done!"
