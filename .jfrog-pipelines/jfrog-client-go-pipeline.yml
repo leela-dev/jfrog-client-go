@@ -44,7 +44,6 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - printenv isPullRequest
             - task: testtask@v0.0.2
               input:
                 resourceName: $step_triggered_by_resource_name
@@ -73,3 +72,61 @@ pipelines:
                 resourceName: $step_triggered_by_resource_name
                 excludeRules: G204,G301,G302,G304,G306
                 commandArgs: -exclude-dir=\.*test\.*
+      - name: Frogbot_Fix
+        type: Bash
+        configuration:
+          condition: 'isPullRequest == "false"'
+          integrations:
+            - name: jfrogPlatform
+            - name: LeelaGitHub
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoSource
+          inputSteps:
+            - name: static_code_analysis
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            # Run frogbot task
+            - task: frogbot@v0.0.1
+              id: frogbot_test
+              input:
+                repository: "leela-dev/jfrog-client-go"
+                platformAccessTokenIntegration: "jfrogPlatform"
+                resourceName: "jfrogClientGoRepoSource"
+                botAction: "create-fix-pull-requests"
+      - name: Frogbot_Scan_PR
+        type: Bash
+        configuration:
+          condition: 'isPullRequest == "true"'
+          integrations:
+            - name: jfrogPlatform
+            - name: LeelaGitHub
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoSource
+          inputSteps:
+            - name: static_code_analysis
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            # Run frogbot task
+            - task: frogbot@v0.0.1
+              id: frogbot_test
+              input:
+                repository: "leela-dev/jfrog-client-go"
+                platformAccessTokenIntegration: "jfrogPlatform"
+                resourceName: "jfrogClientGoRepoSource"
+                botAction: "scan-pull-request"
