@@ -13,7 +13,7 @@ resources:
         pullRequestCreate: true
 
 pipelines:
-  - name: jfrog_go_client
+  - name: jfrog_go_client_pullrequest
     configuration:
       jfrogCliVersion: 2
       runtime:
@@ -31,10 +31,10 @@ pipelines:
         type: Bash
         configuration:
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
         execution:
           onStart:
-            - add_run_variables isPullRequest=$res_jfrogClientGoRepoSource_isPullRequest
+            - add_run_variables isPullRequest=$res_jfrogClientGoRepoSourcePR_isPullRequest
       - name: static_code_analysis
         type: Bash
         configuration:
@@ -43,7 +43,7 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -63,7 +63,7 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
           inputSteps:
             - name: pre_run
         execution:
@@ -90,7 +90,7 @@ pipelines:
             - name: LeelaGitHub
             - name: int_default_artifactory
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
           inputSteps:
             - name: pre_run
         execution:
@@ -108,7 +108,7 @@ pipelines:
               input:
                 repository: "leela-dev/jfrog-client-go"
                 platformAccessTokenIntegration: "jfrogPlatform"
-                resourceName: "jfrogClientGoRepoSource"
+                resourceName: "jfrogClientGoRepoSourcePR"
                 botAction: "scan-pull-request"
       - name: lint
         type: Bash
@@ -119,7 +119,7 @@ pipelines:
             - name: int_default_artifactory
             - name: EcoSysSecrets
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
           inputSteps:
             - name: pre_run
         execution:
@@ -131,7 +131,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - cd $res_jfrogClientGoRepoSourcePR_resourcePath
             - go vet -v ./...
       - name: artifactory_tests
         type: Matrix
@@ -145,7 +145,7 @@ pipelines:
             - name: int_default_artifactory
             - name: EcoSysSecrets
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
           inputSteps:
             - name: lint
           multiNode: true
@@ -162,7 +162,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - cd $res_jfrogClientGoRepoSourcePR_resourcePath
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
             - ~/go/bin/local-rt-setup
             - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.artifactory --ci.runId=${operating_system}-artifactory
@@ -177,7 +177,7 @@ pipelines:
             - name: jfrogPlatform
             - name: int_default_artifactory
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
           inputSteps:
             - name: lint
           multiNode: true
@@ -198,7 +198,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - cd $res_jfrogClientGoRepoSourcePR_resourcePath
             - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
             - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.${suite} --rt.url=$int_int_default_artifactory_url --ds.url=$HOST_URL/distribution --xr.url=$HOST_URL/xray --access.url=$HOST_URL/access --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --access.token=$int_jfrogPlatform_accessToken --ci.runId=${operating_system}-${suite}
       - name: pipeline_tests
@@ -211,7 +211,7 @@ pipelines:
             - name: jfrogPlatform
             - name: int_default_artifactory
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
           inputSteps:
             - name: lint
           nodePool: default-dynamic-nodepool
@@ -224,9 +224,9 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - cd $res_jfrogClientGoRepoSourcePR_resourcePath
             - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
-            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url --pipe.url=$HOST_URL/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=$res_jfrogClientGoRepoSource_gitRepoFullName --pipe.vcsBranch=$res_jfrogClientGoRepoSource_branchName --ci.runId=${operating_system}_pipe
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url --pipe.url=$HOST_URL/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=$res_jfrogClientGoRepoSourcePR_gitRepoFullName --pipe.vcsBranch=$res_jfrogClientGoRepoSourcePR_branchName --ci.runId=${operating_system}_pipe
       - name: jfrog_client_go_repositories_tests
         type: Bash
         configuration:
@@ -234,7 +234,7 @@ pipelines:
             - name: int_default_artifactory
             - name: EcoSysSecrets
           inputResources:
-            - name: jfrogClientGoRepoSource
+            - name: jfrogClientGoRepoSourcePR
           inputSteps:
             - name: lint
           environmentVariables:
@@ -251,7 +251,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - cd $res_jfrogClientGoRepoSourcePR_resourcePath
             - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
             - ~/go/bin/local-rt-setup

@@ -12,7 +12,7 @@ resources:
         commit: true
 
 pipelines:
-  - name: jfrog_go_client
+  - name: jfrog_go_client_push
     configuration:
       jfrogCliVersion: 2
       runtime:
