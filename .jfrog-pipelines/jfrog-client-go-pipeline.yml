@@ -169,6 +169,7 @@ pipelines:
           integrations:
             - name: int_default_artifactory
             - name: EcoSysSecrets
+            - name: jfrogPlatform
           inputResources:
             - name: jfrogClientGoRepoSource
           inputSteps:
@@ -187,6 +188,7 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
+            - echo $int_jfrogPlatform_url
             - cd $res_jfrogClientGoRepoSource_resourcePath
             - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
             - ~/go/bin/local-rt-setup
