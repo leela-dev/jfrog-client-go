@@ -36,7 +36,7 @@ pipelines:
             - name: jfrogClientGoRepoSource
         execution:
           onStart:
-            - add_run_variables 'isPullRequest=$res_jfrogClientGoRepoSource_isPullRequest'
+            - add_run_variables isPullRequest=$res_jfrogClientGoRepoSource_isPullRequest
             - task: jfrog/setup-go@v0.0.2
               input:
                 version: "1.19.3"
