@@ -27,16 +27,25 @@ pipelines:
         readOnly:
           RESOLVE_REPO: npm-virtual
     steps:
+      - name: pre_run
+        type: Bash
+        configuration:
+          inputResources:
+            - name: jfrogClientGoRepoSource
+        execution:
+          onStart:
+            - add_run_variables isPullRequest=$res_jfrogClientGoRepoSource_isPullRequest
       - name: static_code_analysis
         type: Bash
         configuration:
+          inputSteps:
+            -name: pre_run
           integrations:
             - name: int_default_artifactory
           inputResources:
             - name: jfrogClientGoRepoSource
         execution:
           onStart:
-            - add_run_variables isPullRequest=$res_jfrogClientGoRepoSource_isPullRequest
             - task: jfrog/setup-go@v0.0.2
               input:
                 version: "1.19.3"
@@ -56,7 +65,7 @@ pipelines:
           inputResources:
             - name: jfrogClientGoRepoSource
           inputSteps:
-            - name: static_code_analysis
+            - name: pre_run
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -82,7 +91,7 @@ pipelines:
           inputResources:
             - name: jfrogClientGoRepoSource
           inputSteps:
-            - name: static_code_analysis
+            - name: pre_run
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -92,7 +101,6 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            # Run frogbot task
             - task: frogbot@v0.0.1
               id: frogbot_test
               input:
@@ -111,7 +119,7 @@ pipelines:
           inputResources:
             - name: jfrogClientGoRepoSource
           inputSteps:
-            - name: static_code_analysis
+            - name: pre_run
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -132,7 +140,6 @@ pipelines:
       - name: lint
         type: Bash
         configuration:
-          condition: 'isPullRequest == "true"'
           requiresApproval: true
           integrations:
             - name: int_default_artifactory
@@ -140,7 +147,7 @@ pipelines:
           inputResources:
             - name: jfrogClientGoRepoSource
           inputSteps:
-            - name: static_code_analysis
+            - name: pre_run
         execution:
           onStart:
             - task: jfrog/setup-go@v0.0.2
@@ -156,7 +163,6 @@ pipelines:
         type: Matrix
         stepMode: Bash
         configuration:
-          condition: 'isPullRequest == "true"'
           environmentVariables:
             JF_URL: $int_int_default_artifactory_url
             RTLIC: $int_EcoSysSecrets_RTLIC
@@ -190,7 +196,6 @@ pipelines:
         type: Matrix
         stepMode: Bash
         configuration:
-          condition: 'isPullRequest == "true"'
           environmentVariables:
             JF_URL: $int_int_default_artifactory_url
             GOPROXY: direct
@@ -225,7 +230,6 @@ pipelines:
       - name: pipeline_tests
         type: Bash
         configuration:
-          condition: 'isPullRequest == "true"'
           environmentVariables:
             JF_URL: $int_int_default_artifactory_url
             GOPROXY: direct
@@ -252,7 +256,6 @@ pipelines:
       - name: jfrog_client_go_repositories_tests
         type: Bash
         configuration:
-          condition: 'isPullRequest == "true"'
           integrations:
             - name: int_default_artifactory
             - name: EcoSysSecrets
