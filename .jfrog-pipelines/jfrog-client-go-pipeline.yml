@@ -55,8 +55,7 @@ pipelines:
           integrations:
             - name: int_default_artifactory
           inputResources:
-            - name: jfrogClientGoRepoOnlyOnCommit
-            - name: jfrogClientGoRepoOnlyOnPR
+            - name: jfrogClientGoRepoSource
           inputSteps:
             - name: static_code_analysis
         execution:
