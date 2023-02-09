@@ -1,7 +1,7 @@
 valuesFilePath: ./values.yml
 
 resources:
-  - name: jfrogClientGoRepoSource
+  - name: jfrogClientGoRepoSourcePR
     type: GitRepo
     configuration:
       gitProvider: {{ .Values.gitIntegration }}
@@ -9,7 +9,8 @@ resources:
       branches:
         include: dev
       buildOn:
-        commit: true
+        commit: false
+        pullRequestCreate: true
 
 pipelines:
   - name: jfrog_go_client
@@ -79,34 +80,6 @@ pipelines:
                 resourceName: $step_triggered_by_resource_name
                 excludeRules: G204,G301,G302,G304,G306
                 commandArgs: -exclude-dir=\.*test\.*
-      - name: Frogbot_Fix
-        type: Bash
-        configuration:
-          condition: 'isPullRequest == "false"'
-          integrations:
-            - name: jfrogPlatform
-            - name: LeelaGitHub
-            - name: int_default_artifactory
-          inputResources:
-            - name: jfrogClientGoRepoSource
-          inputSteps:
-            - name: pre_run
-        execution:
-          onStart:
-            - task: jfrog/setup-go@v0.0.2
-              input:
-                version: "1.19.3"
-                cacheIntegration: int_default_artifactory
-            - go version
-            - go env GOPATH
-          onExecute:
-            - task: frogbot@v0.0.1
-              id: frogbot_test
-              input:
-                repository: "leela-dev/jfrog-client-go"
-                platformAccessTokenIntegration: "jfrogPlatform"
-                resourceName: "jfrogClientGoRepoSource"
-                botAction: "create-fix-pull-requests"
       - name: Frogbot_Scan_PR
         type: Bash
         configuration:
@@ -140,6 +113,8 @@ pipelines:
       - name: lint
         type: Bash
         configuration:
+          requiresApproval: true
+          timeoutSeconds: 300
           integrations:
             - name: int_default_artifactory
             - name: EcoSysSecrets
