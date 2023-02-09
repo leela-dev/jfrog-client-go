@@ -1,0 +1,76 @@
+valuesFilePath: ./values.yml
+
+resources:
+  - name: jfrogClientGoRepoSource
+    type: GitRepo
+    configuration:
+      gitProvider: {{ .Values.gitIntegration }}
+      path: {{ .Values.repoPath }}
+      branches:
+        include: dev
+      buildOn:
+        commit: true
+        pullRequestCreate: true
+
+pipelines:
+  - name: jfrog_go_client
+    configuration:
+      jfrogCliVersion: 2
+      runtime:
+        type: image
+        image:
+          custom:
+            name: releases-docker.jfrog.io/jfrog/pipelines-u18node
+            tag: "16"
+            autoPull: true
+      environmentVariables:
+        readOnly:
+          RESOLVE_REPO: npm-virtual
+    steps:
+      - name: static_code_analysis
+        type: Bash
+        configuration:
+          integrations:
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoSource
+        execution:
+          onStart:
+            - add_run_variables 'isPullRequest=$res_jfrogClientGoRepoSource_isPullRequest'
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - printenv isPullRequest
+            - task: testtask@v0.0.2
+              input:
+                resourceName: $step_triggered_by_resource_name
+                checks: "all, -SA1019, -ST1000, -ST1003, -ST1020, -ST1021, -ST1022"
+      - name: go_sec
+        type: Bash
+        configuration:
+          integrations:
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoOnlyOnCommit
+            - name: jfrogClientGoRepoOnlyOnPR
+          inputSteps:
+            - name: static_code_analysis
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - printenv isPullRequest
+            - task: gosec@v0.0.1
+              input:
+                resourceName: $step_triggered_by_resource_name
+                excludeRules: G204,G301,G302,G304,G306
+                commandArgs: -exclude-dir=\.*test\.*
