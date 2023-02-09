@@ -66,7 +66,6 @@ pipelines:
             - go version
             - go env GOPATH
           onExecute:
-            - printenv isPullRequest
             - task: gosec@v0.0.1
               input:
                 resourceName: $step_triggered_by_resource_name
@@ -130,3 +129,153 @@ pipelines:
                 platformAccessTokenIntegration: "jfrogPlatform"
                 resourceName: "jfrogClientGoRepoSource"
                 botAction: "scan-pull-request"
+      - name: lint
+        type: Bash
+        configuration:
+          condition: 'isPullRequest == "true"'
+          requiresApproval: true
+          integrations:
+            - name: int_default_artifactory
+            - name: EcoSysSecrets
+          inputResources:
+            - name: jfrogClientGoRepoSource
+          inputSteps:
+            - name: static_code_analysis
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - go vet -v ./...
+      - name: artifactory_tests
+        type: Matrix
+        stepMode: Bash
+        configuration:
+          condition: 'isPullRequest == "true"'
+          environmentVariables:
+            JF_URL: $int_int_default_artifactory_url
+            RTLIC: $int_EcoSysSecrets_RTLIC
+            GOPROXY: direct
+          integrations:
+            - name: int_default_artifactory
+            - name: EcoSysSecrets
+          inputResources:
+            - name: jfrogClientGoRepoSource
+          inputSteps:
+            - name: lint
+          multiNode: true
+        stepletMultipliers:
+          nodePools:
+            - default-dynamic-nodepool
+            - windows_dynamic
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
+            - ~/go/bin/local-rt-setup
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.artifactory --ci.runId=${operating_system}-artifactory
+      - name: ds_xr_access_tests
+        type: Matrix
+        stepMode: Bash
+        configuration:
+          condition: 'isPullRequest == "true"'
+          environmentVariables:
+            JF_URL: $int_int_default_artifactory_url
+            GOPROXY: direct
+          integrations:
+            - name: jfrogPlatform
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoSource
+          inputSteps:
+            - name: lint
+          multiNode: true
+        stepletMultipliers:
+          nodePools:
+            - default-dynamic-nodepool
+            - windows_dynamic
+          environmentVariables:
+            - suite : distribution
+            - suite : xray
+            - suite : access
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.${suite} --rt.url=$int_int_default_artifactory_url --ds.url=$HOST_URL/distribution --xr.url=$HOST_URL/xray --access.url=$HOST_URL/access --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --access.token=$int_jfrogPlatform_accessToken --ci.runId=${operating_system}-${suite}
+      - name: pipeline_tests
+        type: Bash
+        configuration:
+          condition: 'isPullRequest == "true"'
+          environmentVariables:
+            JF_URL: $int_int_default_artifactory_url
+            GOPROXY: direct
+          integrations:
+            - name: jfrogPlatform
+            - name: int_default_artifactory
+          inputResources:
+            - name: jfrogClientGoRepoSource
+          inputSteps:
+            - name: lint
+          nodePool: default-dynamic-nodepool
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.pipelines --rt.url=$int_int_default_artifactory_url --pipe.url=$HOST_URL/pipelines --rt.user=$int_int_default_artifactory_user --rt.password=$int_int_default_artifactory_apikey --pipe.accessToken=$int_jfrogPlatform_accessToken --pipe.vcsToken=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 --pipe.vcsRepo=$res_jfrogClientGoRepoSource_gitRepoFullName --pipe.vcsBranch=$res_jfrogClientGoRepoSource_branchName --ci.runId=${operating_system}_pipe
+      - name: jfrog_client_go_repositories_tests
+        type: Bash
+        configuration:
+          condition: 'isPullRequest == "true"'
+          integrations:
+            - name: int_default_artifactory
+            - name: EcoSysSecrets
+          inputResources:
+            - name: jfrogClientGoRepoSource
+          inputSteps:
+            - name: lint
+          environmentVariables:
+            JF_URL: $int_int_default_artifactory_url
+            GOPROXY: direct
+            RTLIC: $int_EcoSysSecrets_RTLIC
+          nodePool: default-dynamic-nodepool
+        execution:
+          onStart:
+            - task: jfrog/setup-go@v0.0.2
+              input:
+                version: "1.19.3"
+                cacheIntegration: int_default_artifactory
+            - go version
+            - go env GOPATH
+          onExecute:
+            - cd $res_jfrogClientGoRepoSource_resourcePath
+            - add_run_variables HOST_URL="$(echo $int_int_default_artifactory_url | sed -r 's#([^/])/[^/].*#\1#')"
+            - go install github.com/jfrog/jfrog-testing-infra/local-rt-setup@latest
+            - ~/go/bin/local-rt-setup
+            - go test -v github.com/jfrog/jfrog-client-go/tests --timeout 0 --test.repositories
