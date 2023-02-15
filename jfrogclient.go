@@ -9,7 +9,7 @@ func GetVersion() string {
 	return agentVersion
 }
 
-// Dummy build 9
+// Dummy build 10
 func GetName() string {
 	return agentName
 }
