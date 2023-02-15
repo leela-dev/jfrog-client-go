@@ -16,6 +16,7 @@ import (
 
 const (
 	submoduleDotGitPrefix = "gitdir: "
+	unusedconstfield = "leela"
 )
 
 type GitManager struct {
