@@ -165,7 +165,8 @@ func (sm *XrayServicesManager) GenerateVulnerabilitiesReport(params services.Rep
 func (sm *XrayServicesManager) ReportDetails(reportId string) (details *services.ReportDetails, err error) {
 	reportService := services.NewReportService(sm.client)
 	reportService.XrayDetails = sm.config.GetServiceDetails()
-	return reportService.Details(reportId)
+	d, err := reportService.Details(reportId)
+	return d, err
 }
 
 // ReportContent returns a Xray report content response for the requested report
